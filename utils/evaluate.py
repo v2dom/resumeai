@@ -1,11 +1,34 @@
 import os
 import openai
 import markdown
+from flask import Flask, render_template, request, url_for
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 model = SentenceTransformer('all-MiniLM-L6-v2')
+
+app = Flask(__name__)
+
+@app.route("/resumeai", methods=["GET", "POST"])
+def resumeai():
+    score = None
+    feedback = None
+
+    if request.method == "POST":
+        resume = request.files["resume"]
+        desired_title = request.form.get("desired_title", "").strip()
+        resume_text = resume.read().decode("utf-8")  # Replace this if you use custom extract logic
+
+        if desired_title:
+            score = get_similarity_score(resume_text, desired_title)
+
+        feedback_raw = get_ai_feedback(resume_text, desired_title)
+        feedback = markdown.markdown(feedback_raw)
+
+        return render_template("index.html", score=score, feedback=feedback, show_score=bool(desired_title))
+
+    return render_template("index.html", score=None, feedback=None, show_score=False)
 
 def get_similarity_score(resume_text, job_title=None):
     if job_title:
@@ -59,3 +82,6 @@ Resume:
 
     markdown_content = response.choices[0].message.content.strip()
     return markdown.markdown(markdown_content)
+
+if __name__ == "__main__":
+    app.run(debug=True)
