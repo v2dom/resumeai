@@ -1,24 +1,25 @@
 import os
 import openai
 import markdown
+import numpy as np
 from flask import Flask, render_template, request, url_for
-from sentence_transformers import SentenceTransformer
+from flask_cors import CORS
 from sklearn.metrics.pairwise import cosine_similarity
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
-model = SentenceTransformer('paraphrase-MiniLM-L3-v2')
 
 app = Flask(__name__)
+CORS(app, origins=["https://resumeai.v2dom.dev"], supports_credentials=True)
 
-@app.route("/resumeai", methods=["GET", "POST"])
-def resumeai():
+@app.route("/", methods=["GET", "POST"])
+def index():
     score = None
     feedback = None
 
     if request.method == "POST":
         resume = request.files["resume"]
         desired_title = request.form.get("desired_title", "").strip()
-        resume_text = resume.read().decode("utf-8")  # Replace this if you use custom extract logic
+        resume_text = resume.read().decode("utf-8")
 
         if desired_title:
             score = get_similarity_score(resume_text, desired_title)
@@ -31,13 +32,22 @@ def resumeai():
     return render_template("index.html", score=None, feedback=None, show_score=False)
 
 def get_similarity_score(resume_text, job_title=None):
-    if job_title:
-        comparison_text = f"This resume is applying for the role: {job_title}."
-    else:
-        comparison_text = resume_text
+    if not job_title:
+        return None
 
-    embeddings = model.encode([resume_text, comparison_text])
-    score = cosine_similarity([embeddings[0]], [embeddings[1]])[0][0]
+    comparison_text = f"This resume is applying for the role: {job_title}."
+
+    resume_embedding = openai.embeddings.create(
+        model="text-embedding-3-small",
+        input=resume_text
+    ).data[0].embedding
+
+    job_embedding = openai.embeddings.create(
+        model="text-embedding-3-small",
+        input=comparison_text
+    ).data[0].embedding
+
+    score = cosine_similarity([resume_embedding], [job_embedding])[0][0]
     return round(score * 100, 2)
 
 def get_ai_feedback(resume_text, desired_title=None):
@@ -84,4 +94,4 @@ Resume:
     return markdown.markdown(markdown_content)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
