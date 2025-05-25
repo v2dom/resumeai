@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Resume Evaluator @v2dom</title>
+  <link rel="icon" href="static/logo.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {},
+      },
+    }
+  </script>
+  <link href="https://cdn.jsdelivr.net/npm/@tailwindcss/typography@0.5.9/dist/typography.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-white text-black dark:bg-gray-900 dark:text-white font-sans">
+  <div class="max-w-xl mx-auto p-6 bg-white dark:bg-gray-800 text-black dark:text-white mt-10 rounded-xl shadow-md">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-3xl font-bold text-center">Resume Evaluator AI</h1>
+      <button id="theme-toggle" class="text-sm p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+        <span id="theme-icon"></span>
+      </button>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="space-y-6">
+      <div>
+        <label class="block mb-2 text-sm font-medium">Upload Resume (PDF or DOCX)</label>
+        <input type="file" name="resume" required class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded-md" />
+      </div>
+
+      <div>
+        <label class="block mb-2 text-sm font-medium">Desired Job Title (optional)</label>
+        <input id="job-title" type="text" name="desired_title" placeholder="e.g. Software Engineer" class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded-md" />
+      </div>
+
+      <div class="text-center">
+        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">Evaluate</button>
+      </div>
+    </form>
+
+    {% if show_score %}
+      <div class="mt-10">
+        <h2 class="text-xl font-semibold text-green-600 dark:text-green-400">Match Score: {{ score }}%</h2>
+      </div>
+    {% endif %}
+
+    {% if feedback %}
+      <div class="bg-gray-100 dark:bg-gray-700 p-4 mt-4 border border-gray-300 dark:border-gray-600 rounded-md prose dark:prose-invert max-w-none" id="current-feedback">
+        {{ feedback|safe }}
+        <div class="mt-4 text-center">
+          <a href="/" class="inline-block text-sm text-blue-400 underline">⬅ Return to form</a>
+        </div>
+      </div>
+    {% endif %}
+
+    <div id="previous-submissions" class="mt-8 hidden">
+      <div class="flex justify-between items-center mb-2">
+        <h2 class="text-lg font-semibold">Previous Submissions</h2>
+        <button id="clear-submissions" class="text-xs text-red-500 hover:underline">Clear All</button>
+      </div>
+      <div id="submissions-list" class="space-y-4"></div>
+    </div>
+  </div>
+
+  <script>
+    const toggle = document.getElementById('theme-toggle');
+    const icon = document.getElementById('theme-icon');
+
+    function setThemeIcon(isDark) {
+      icon.innerHTML = isDark
+        ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/></svg>'
+        : '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-8.66l-.7.7M4.34 4.34l-.7.7M21 12h-1M4 12H3m15.66 4.34l-.7-.7M6.34 19.66l-.7-.7M12 5a7 7 0 100 14 7 7 0 000-14z"/></svg>';
+    }
+
+    toggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      setThemeIcon(isDark);
+    });
+
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldUseDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+    document.documentElement.classList.toggle('dark', shouldUseDark);
+    setThemeIcon(shouldUseDark);
+
+    document.querySelector("form").addEventListener("submit", () => {
+      const feedbackDiv = document.getElementById("current-feedback");
+      const jobTitle = document.getElementById("job-title").value;
+      if (feedbackDiv) {
+        const html = feedbackDiv.innerHTML;
+        const submissions = JSON.parse(localStorage.getItem("resumeSubmissions") || "[]");
+        submissions.unshift({ title: jobTitle || "No title provided", content: html });
+        localStorage.setItem("resumeSubmissions", JSON.stringify(submissions.slice(0, 5)));
+      }
+    });
+
+    function renderSubmissions() {
+      const container = document.getElementById("submissions-list");
+      const wrapper = document.getElementById("previous-submissions");
+      const submissions = JSON.parse(localStorage.getItem("resumeSubmissions") || "[]");
+      if (submissions.length) {
+        wrapper.classList.remove("hidden");
+        container.innerHTML = submissions.map(s => `
+          <div class="border border-gray-300 dark:border-gray-600 p-3 rounded-md bg-gray-50 dark:bg-gray-700 prose dark:prose-invert">
+            <h3 class="text-sm font-bold">${s.title}</h3>
+            <div>${s.content}</div>
+          </div>
+        `).join("");
+      }
+    }
+
+    document.getElementById("clear-submissions")?.addEventListener("click", () => {
+      localStorage.removeItem("resumeSubmissions");
+      document.getElementById("submissions-list").innerHTML = "";
+      document.getElementById("previous-submissions").classList.add("hidden");
+    });
+
+    renderSubmissions();
+  </script>
+</body>
+</html>

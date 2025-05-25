@@ -1,0 +1,14 @@
+body {
+  font-family: sans-serif;
+  margin: 2rem;
+  background-color: #f5f5f5;
+}
+h1 {
+  color: #222;
+}
+pre {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 5px;
+  white-space: pre-wrap;
+}
