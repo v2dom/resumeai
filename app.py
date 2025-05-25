@@ -3,6 +3,10 @@ from utils.parse_resume import extract_text as extract_resume
 from utils.evaluate import get_similarity_score, get_ai_feedback
 import os
 from dotenv import load_dotenv
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app, origins=["https://v2dom.dev"], supports_credentials=True)
 
 load_dotenv()
 
