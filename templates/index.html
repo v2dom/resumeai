@@ -10,61 +10,74 @@
     tailwind.config = {
       darkMode: 'class',
       theme: {
-        extend: {},
+        extend: {
+          colors: {
+            primary: '#4b5563', // Soft gray for the primary theme
+            secondary: '#9ca3af', // Lighter gray for accents
+            accent: '#f3f4f6', // Soft background gray for the overall feel
+          },
+        },
       },
-    }
+    };
   </script>
   <link href="https://cdn.jsdelivr.net/npm/@tailwindcss/typography@0.5.9/dist/typography.min.css" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body class="bg-white text-black dark:bg-gray-900 dark:text-white font-sans">
-  <div class="max-w-xl mx-auto p-6 bg-white dark:bg-gray-800 text-black dark:text-white mt-10 rounded-xl shadow-md">
-    <div class="flex justify-between items-center mb-4">
-      <h1 class="text-3xl font-bold text-center">Resume Evaluator AI</h1>
-      <button id="theme-toggle" class="text-sm p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+
+  <div class="max-w-3xl mx-auto p-8 bg-white dark:bg-gray-800 text-black dark:text-white mt-16 rounded-2xl shadow-lg">
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-4xl font-bold text-center text-primary">AI Resume Evaluator</h1>
+      <button id="theme-toggle" class="p-3 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition">
         <span id="theme-icon"></span>
       </button>
     </div>
 
-    <form method="POST" enctype="multipart/form-data" class="space-y-6">
+    <form method="POST" enctype="multipart/form-data" class="space-y-8">
       <div>
-        <label class="block mb-2 text-sm font-medium">Upload Resume (PDF or DOCX)</label>
-        <input type="file" name="resume" required class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded-md" />
+        <label class="block mb-2 text-lg font-semibold">Upload Resume (.pdf or .docx)</label>
+        <input type="file" name="resume" required class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white p-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition" />
       </div>
 
       <div>
-        <label class="block mb-2 text-sm font-medium">Desired Job Title (optional)</label>
-        <input id="job-title" type="text" name="desired_title" placeholder="e.g. Software Engineer" class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white p-2 rounded-md" />
+        <label class="block mb-2 text-lg font-semibold">Desired Job Title (optional)</label>
+        <input id="job-title" type="text" name="desired_title" placeholder="e.g. Software Engineer" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white p-3 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary transition" />
       </div>
 
       <div class="text-center">
-        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition">Evaluate</button>
+        <button type="submit" class="bg-primary text-white px-8 py-3 rounded-md hover:bg-gray-500 transition">Evaluate</button>
       </div>
     </form>
 
     {% if show_score %}
-      <div class="mt-10">
+      <div class="mt-12">
         <h2 class="text-xl font-semibold text-green-600 dark:text-green-400">Match Score: {{ score }}%</h2>
       </div>
     {% endif %}
 
     {% if feedback %}
-      <div class="bg-gray-100 dark:bg-gray-700 p-4 mt-4 border border-gray-300 dark:border-gray-600 rounded-md prose dark:prose-invert max-w-none" id="current-feedback">
+      <div class="bg-gray-100 dark:bg-gray-700 p-4 mt-6 border border-gray-300 dark:border-gray-600 rounded-md prose dark:prose-invert max-w-none" id="current-feedback">
         {{ feedback|safe }}
         <div class="mt-4 text-center">
-          <a href="https://resumeai.v2dom.dev" class="inline-block text-sm text-blue-400 underline">⬅ Return to form</a>
+          <a href="https://resumeai.v2dom.dev" class="inline-block text-sm text-blue-400 underline">Return</a>
         </div>
       </div>
     {% endif %}
 
-    <div id="previous-submissions" class="mt-8 hidden">
-      <div class="flex justify-between items-center mb-2">
+    <div id="previous-submissions" class="mt-10 hidden">
+      <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-semibold">Previous Submissions</h2>
         <button id="clear-submissions" class="text-xs text-red-500 hover:underline">Clear All</button>
       </div>
       <div id="submissions-list" class="space-y-4"></div>
     </div>
   </div>
+
+  <footer class="mt-12 text-center">
+    <p class="text-sm text-gray-600 dark:text-gray-400">© 2025 Dominick Woodward</p>
+    <div class="mt-4">
+      <a href="/terms-of-service" class="text-sm text-primary underline">Terms of Service</a>
+    </div>
+  </footer>
 
   <script>
     const toggle = document.getElementById('theme-toggle');

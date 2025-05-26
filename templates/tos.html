@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms of Service | AI Resume Evaluator @v2dom</title>
+  <link rel="icon" href="static/logo.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {},
+      },
+    }
+  </script>
+  <link href="https://cdn.jsdelivr.net/npm/@tailwindcss/typography@0.5.9/dist/typography.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-white text-black dark:bg-gray-900 dark:text-white font-sans">
+
+  <div class="max-w-xl mx-auto p-6 bg-white dark:bg-gray-800 text-black dark:text-white mt-10 rounded-xl shadow-md">
+    <div class="flex justify-between items-center mb-4">
+      <h1 class="text-3xl font-bold text-center">Terms of Service</h1>
+      <button id="theme-toggle" class="text-sm p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition">
+        <span id="theme-icon"></span>
+      </button>
+    </div>
+
+    <div class="prose dark:prose-invert">
+      <p>
+        <br>
+        This service is an AI-powered resume evaluation tool designed to help users improve their resumes. 
+        It is provided at no cost and is intended for use as is. 
+        This page outlines the policies regarding the use of this service and data handling practices.
+        <br><br>
+      </p>
+      <h2 class="text-2xl font-bold text-left">Information Collection and Use</h2>
+      <p>
+        This service does not store any personal data or share your information with third parties. 
+        The app temporarily accesses the contents of your resume to evaluate it based on industry standards and best practices. 
+        No data is stored permanently or used outside the scope of this service.
+        <br><br>
+        For security purposes, it is recommend you do not upload sensitive personal information such as social security numbers, passwords, or financial details.
+        <br><br>
+      </p>
+
+      <h2 class="text-2xl font-bold text-left">Deletion of Data</h2>
+      <p>
+        This service does not retain any user data after the evaluation process. 
+        You may clear your browser's cache and site data to remove any temporary information stored locally on your device.
+        <br><br>
+      </p>
+
+      <h2 class="text-2xl font-bold text-left">Your Agreement</h2>
+      <p>
+        By using this service, you agree to allow temporary access to your resume for the sole purpose of evaluating it. 
+        No data is stored permanently or used outside the scope of this application.
+        <br><br>
+      </p>
+
+      <h2 class="text-2xl font-bold text-left">Contact</h2>
+      <p>
+        If you have any questions, feedback, or concerns, feel free to reach out at dominick@v2dom.dev
+      </p>
+
+      <p class="text-sm text-gray-600 mt-10">© 2025 Dominick Woodward</p>
+    </div>
+  </div>
+
+  <script>
+    const toggle = document.getElementById('theme-toggle');
+    const icon = document.getElementById('theme-icon');
+
+    function setThemeIcon(isDark) {
+      icon.innerHTML = isDark
+        ? '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/></svg>'
+        : '<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m8.66-8.66l-.7.7M4.34 4.34l-.7.7M21 12h-1M4 12H3m15.66 4.34l-.7-.7M6.34 19.66l-.7-.7M12 5a7 7 0 100 14 7 7 0 000-14z"/></svg>';
+    }
+
+    toggle.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+      const isDark = document.documentElement.classList.contains('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+      setThemeIcon(isDark);
+    });
+
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const shouldUseDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+    document.documentElement.classList.toggle('dark', shouldUseDark);
+    setThemeIcon(shouldUseDark);
+  </script>
+</body>
+</html>
