@@ -10,8 +10,6 @@ CORS(app, origins=["https://v2dom.dev"], supports_credentials=True)
 
 load_dotenv()
 
-app = Flask(__name__)
-
 @app.route("/", methods=["GET", "POST"])
 def index():
     if request.method == "POST":
