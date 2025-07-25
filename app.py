@@ -27,6 +27,10 @@ def index():
 
     return render_template("index.html", score=None, feedback=None, show_score=False)
 
+@app.route("/tos")
+def tos():
+    return render_template("tos.html")
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
